@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+package pb;
+
+service Cart {
+    rpc AddCart (AddCartRequest) returns (AddCartResponse) {}
+    rpc AddItem (AddItemRequest) returns (AddItemResponse) {}
+}
+
+message AddCartRequest {
+    int64 id = 1;
+}
+
+message AddCartResponse {
+    int64 id = 1;
+    string err = 2;
+}
+
+message AddItemRequest {
+    int64 id = 1;
+    string detail = 2;
+    float price = 3;
+}
+
+message AddItemResponse {
+    int64 id = 1;
+    string err = 2;
+}
