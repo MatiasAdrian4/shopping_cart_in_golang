@@ -9,11 +9,11 @@ import (
 	"shopping_cart/pb"
 )
 
-func NewGRPCClient(conn *grpc.ClientConn) CartService {
+func NewGRPCClient(conn *grpc.ClientConn) ShoppingCartService {
 
 	addCartEndpoint := grpctransport.NewClient(
 		conn,
-		"pb.CartService",
+		"pb.ShoppingCartService",
 		"AddCart",
 		encodeGRPCAddCartRequest,
 		decodeGRPCAddCartResponse,
@@ -22,7 +22,7 @@ func NewGRPCClient(conn *grpc.ClientConn) CartService {
 
 	addItemEndpoint := grpctransport.NewClient(
 		conn,
-		"pb.CartService",
+		"pb.ShoppingCartService",
 		"AddItem",
 		encodeGRPCAddItemRequest,
 		decodeGRPCAddItemResponse,

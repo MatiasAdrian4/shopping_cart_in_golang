@@ -2,9 +2,14 @@ syntax = "proto3";
 
 package pb;
 
-service Cart {
+service ShoppingCart {
     rpc AddCart (AddCartRequest) returns (AddCartResponse) {}
+    rpc GetCart (GetCartRequest) returns (GetCartResponse) {}
     rpc AddItem (AddItemRequest) returns (AddItemResponse) {}
+}
+
+message Cart {
+    int64 id = 1;
 }
 
 message AddCartRequest {
@@ -13,6 +18,15 @@ message AddCartRequest {
 
 message AddCartResponse {
     int64 id = 1;
+    string err = 2;
+}
+
+message GetCartRequest {
+    int64 id = 1;
+}
+
+message GetCartResponse {
+    Cart cart = 1;
     string err = 2;
 }
 

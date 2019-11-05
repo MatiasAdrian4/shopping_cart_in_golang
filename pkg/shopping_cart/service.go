@@ -7,45 +7,61 @@ import (
 	"strconv"
 
 	_ "github.com/go-sql-driver/mysql"
+
+	"shopping_cart/pb"
 )
 
-type CartService interface {
+type ShoppingCartService interface {
 	AddCart(context.Context, int) (int, error)
+	GetCart(context.Context, int) (*pb.Cart, error)
 	AddItem(context.Context, int, string, float64) (int, error)
 }
 
-func NewServer() CartService {
-	var svc CartService
-	svc = NewCartService()
-	return svc
+func NewShoppingCartServer() ShoppingCartService {
+	return shoppingCartService{}
 }
 
-func NewCartService() CartService {
-	return cartService{}
-}
+type shoppingCartService struct{}
 
-type cartService struct{}
-
-func (s cartService) AddCart(_ context.Context, Id int) (int, error) {
+func (s shoppingCartService) AddCart(_ context.Context, Id int) (int, error) {
 	db, err := connect()
 	if err != nil {
 		panic(err)
 	}
 	defer db.Close()
 
-	db.QueryRow("INSERT INTO Cart (id) VALUES(" + strconv.Itoa(Id) + ")")
+	db.QueryRow("INSERT INTO shopping_cart.Cart (id) VALUES(" + strconv.Itoa(Id) + ")")
 
 	return Id, nil
 }
 
-func (s cartService) AddItem(_ context.Context, Id int, Detail string, Price float64) (int, error) {
+func (s shoppingCartService) GetCart(_ context.Context, Id int) (*pb.Cart, error) {
 	db, err := connect()
 	if err != nil {
 		panic(err)
 	}
 	defer db.Close()
 
-	db.QueryRow("INSERT INTO Item (id,detail,price) VALUES(" + strconv.Itoa(Id) + ",'" + Detail + "'," + fmt.Sprintf("%f", Price) + ")")
+	sqlStatement := `SELECT id FROM shopping_cart.Cart WHERE id=?;`
+	row := db.QueryRow(sqlStatement, Id)
+	var id int
+	err = row.Scan(&id)
+	if err != nil {
+		return nil, err
+	}
+	return &pb.Cart{
+		Id: int64(id),
+	}, nil
+}
+
+func (s shoppingCartService) AddItem(_ context.Context, Id int, Detail string, Price float64) (int, error) {
+	db, err := connect()
+	if err != nil {
+		panic(err)
+	}
+	defer db.Close()
+
+	db.QueryRow("INSERT INTO shopping_cart.Item (id,detail,price) VALUES(" + strconv.Itoa(Id) + ",'" + Detail + "'," + fmt.Sprintf("%f", Price) + ")")
 
 	return Id, nil
 }

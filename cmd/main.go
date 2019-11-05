@@ -30,7 +30,7 @@ func main() {
 	fs.Parse(os.Args[1:])
 
 	var (
-		service     = sc.NewServer()
+		service     = sc.NewShoppingCartServer()
 		endpoints   = sc.MakeEndpoints(service)
 		httpHandler = sc.NewHTTPHandler(endpoints)
 		grpcServer  = sc.NewGRPCServer(endpoints)
@@ -54,7 +54,7 @@ func main() {
 	}
 	g.Add(func() error {
 		baseServer := grpc.NewServer(grpc.UnaryInterceptor(kitgrpc.Interceptor))
-		pb.RegisterCartServer(baseServer, grpcServer)
+		pb.RegisterShoppingCartServer(baseServer, grpcServer)
 		return baseServer.Serve(grpcListener)
 	}, func(error) {
 		grpcListener.Close()
