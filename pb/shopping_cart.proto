@@ -6,7 +6,10 @@ service ShoppingCart {
     rpc AddCart (AddCartRequest) returns (AddCartResponse) {}
     rpc GetCart (GetCartRequest) returns (GetCartResponse) {}
     rpc ListCarts (ListCartsRequest) returns (ListCartsResponse) {}
+    
     rpc AddItem (AddItemRequest) returns (AddItemResponse) {}
+    rpc GetItem (GetItemRequest) returns (GetItemResponse) {}
+    rpc ListItems (ListItemsRequest) returns (ListItemsResponse) {}
 }
 
 message Cart {
@@ -39,6 +42,12 @@ message ListCartsResponse {
     string err = 2;
 }
 
+message Item {
+    int64 id = 1;
+    string detail = 2;
+    double price = 3;
+}
+
 message AddItemRequest {
     int64 id = 1;
     string detail = 2;
@@ -47,5 +56,22 @@ message AddItemRequest {
 
 message AddItemResponse {
     int64 id = 1;
+    string err = 2;
+}
+
+message GetItemRequest {
+    int64 id = 1;
+}
+
+message GetItemResponse {
+    Item item = 1;
+    string err = 2;
+}
+
+message ListItemsRequest {
+}
+
+message ListItemsResponse {
+    repeated Item items = 1;
     string err = 2;
 }

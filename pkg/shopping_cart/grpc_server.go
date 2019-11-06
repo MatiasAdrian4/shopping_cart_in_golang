@@ -14,6 +14,8 @@ type grpcServer struct {
 	getCart grpctransport.Handler
 	listCarts grpctransport.Handler
 	addItem grpctransport.Handler
+	getItem grpctransport.Handler
+	listItems grpctransport.Handler
 }
 
 func NewGRPCServer(endpoints Endpoints) pb.ShoppingCartServer {
@@ -37,6 +39,16 @@ func NewGRPCServer(endpoints Endpoints) pb.ShoppingCartServer {
 			endpoints.AddItemEndpoint,
 			decodeGRPCAddItemRequest,
 			encodeGRPCAddItemResponse,
+		),
+		getItem: grpctransport.NewServer(
+			endpoints.GetItemEndpoint,
+			decodeGRPCGetItemRequest,
+			encodeGRPCGetItemResponse,
+		),
+		listItems: grpctransport.NewServer(
+			endpoints.ListItemsEndpoint,
+			decodeGRPCListItemsRequest,
+			encodeGRPCListItemsResponse,
 		),
 	}
 }
@@ -128,6 +140,49 @@ func encodeGRPCAddItemResponse(_ context.Context, response interface{}) (interfa
 	resp := response.(AddItemResponse)
 	return &pb.AddItemResponse{
 		Id: int64(resp.Id), 
+		Err: err2str(resp.Err),
+	}, nil
+}
+
+func (s *grpcServer) GetItem(ctx context.Context, req *pb.GetItemRequest) (*pb.GetItemResponse, error) {
+	_, resp, err := s.getItem.ServeGRPC(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	return resp.(*pb.GetItemResponse), nil
+}
+
+func decodeGRPCGetItemRequest(_ context.Context, grpcReq interface{}) (interface{}, error) {
+	req := grpcReq.(*pb.GetItemRequest)
+	return GetItemRequest{
+		Id: int(req.Id),
+	}, nil
+}
+
+func encodeGRPCGetItemResponse(_ context.Context, response interface{}) (interface{}, error) {
+	resp := response.(GetItemResponse)
+	return &pb.GetItemResponse{
+		Item: resp.Item, 
+		Err: err2str(resp.Err),
+	}, nil
+}
+
+func (s *grpcServer) ListItems(ctx context.Context, req *pb.ListItemsRequest) (*pb.ListItemsResponse, error) {
+	_, resp, err := s.listItems.ServeGRPC(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	return resp.(*pb.ListItemsResponse), nil
+}
+
+func decodeGRPCListItemsRequest(_ context.Context, grpcReq interface{}) (interface{}, error) {
+	return ListItemsRequest{}, nil
+}
+
+func encodeGRPCListItemsResponse(_ context.Context, response interface{}) (interface{}, error) {
+	resp := response.(ListItemsResponse)
+	return &pb.ListItemsResponse{
+		Items: resp.Items, 
 		Err: err2str(resp.Err),
 	}, nil
 }

@@ -33,9 +33,20 @@ func NewHTTPHandler(endpoints Endpoints) http.Handler {
 		decodeHTTPListCartsRequest,
 		encodeHTTPGenericResponse,
 	))
+
 	m.Methods("POST").Path("/add_item/").Handler(httptransport.NewServer(
 		endpoints.AddItemEndpoint,
 		decodeHTTPAddItemRequest,
+		encodeHTTPGenericResponse,
+	))
+	m.Methods("GET").Path("/get_item/{id}").Handler(httptransport.NewServer(
+		endpoints.GetItemEndpoint,
+		decodeHTTPGetItemRequest,
+		encodeHTTPGenericResponse,
+	))
+	m.Methods("GET").Path("/list_items/").Handler(httptransport.NewServer(
+		endpoints.ListItemsEndpoint,
+		decodeHTTPListItemsRequest,
 		encodeHTTPGenericResponse,
 	))
 
@@ -90,6 +101,20 @@ func decodeHTTPAddItemRequest(_ context.Context, r *http.Request) (interface{}, 
 	var req AddItemRequest
 	err := json.NewDecoder(r.Body).Decode(&req)
 	return req, err
+}
+
+func decodeHTTPGetItemRequest(_ context.Context, r *http.Request) (interface{}, error) {
+	var req GetItemRequest
+	id, err := strconv.Atoi(mux.Vars(r)["id"])
+	if err != nil {
+		return nil, err
+	}
+	req.Id = id
+	return req, nil
+}
+
+func decodeHTTPListItemsRequest(_ context.Context, r *http.Request) (interface{}, error) {
+	return ListItemsRequest{}, nil
 }
 
 func encodeHTTPGenericResponse(ctx context.Context, w http.ResponseWriter, response interface{}) error {
