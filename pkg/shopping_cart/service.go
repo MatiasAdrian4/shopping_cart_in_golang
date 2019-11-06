@@ -1,9 +1,9 @@
 package shopping_cart
 
 import (
+	"fmt"
 	"context"
 	"database/sql"
-	"fmt"
 	"strconv"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -14,6 +14,7 @@ import (
 type ShoppingCartService interface {
 	AddCart(context.Context, int) (int, error)
 	GetCart(context.Context, int) (*pb.Cart, error)
+	ListCarts(context.Context) ([]*pb.Cart, error)
 	AddItem(context.Context, int, string, float64) (int, error)
 }
 
@@ -54,6 +55,30 @@ func (s shoppingCartService) GetCart(_ context.Context, Id int) (*pb.Cart, error
 	}, nil
 }
 
+func (s shoppingCartService) ListCarts(_ context.Context) ([]*pb.Cart, error) {
+	db, err := connect()
+	if err != nil {
+		panic(err)
+	}
+	defer db.Close()
+
+	rows, err := db.Query("SELECT id FROM shopping_cart.Cart")
+	if err != nil {
+		return nil, err
+	}
+
+	var carts []*pb.Cart
+	for rows.Next() {
+		var id int
+		rows.Scan(&id)
+		carts = append(carts, &pb.Cart{
+			Id: int64(id),
+		})
+	}
+
+	return carts, nil
+}
+
 func (s shoppingCartService) AddItem(_ context.Context, Id int, Detail string, Price float64) (int, error) {
 	db, err := connect()
 	if err != nil {
@@ -69,7 +94,6 @@ func (s shoppingCartService) AddItem(_ context.Context, Id int, Detail string, P
 func connect() (*sql.DB, error) {
 	db, err := sql.Open("mysql", "root:root@tcp(localhost:3306)/shopping_cart")
 	if err != nil {
-		fmt.Println(err)
 		return nil, err
 	}
 	return db, nil

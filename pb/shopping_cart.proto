@@ -5,6 +5,7 @@ package pb;
 service ShoppingCart {
     rpc AddCart (AddCartRequest) returns (AddCartResponse) {}
     rpc GetCart (GetCartRequest) returns (GetCartResponse) {}
+    rpc ListCarts (ListCartsRequest) returns (ListCartsResponse) {}
     rpc AddItem (AddItemRequest) returns (AddItemResponse) {}
 }
 
@@ -27,6 +28,14 @@ message GetCartRequest {
 
 message GetCartResponse {
     Cart cart = 1;
+    string err = 2;
+}
+
+message ListCartsRequest {
+}
+
+message ListCartsResponse {
+    repeated Cart carts = 1;
     string err = 2;
 }
 
