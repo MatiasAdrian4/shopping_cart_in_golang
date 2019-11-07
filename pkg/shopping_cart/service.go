@@ -19,6 +19,8 @@ type ShoppingCartService interface {
 	AddItem(context.Context, int, string, float64) (int, error)
 	GetItem(context.Context, int) (*pb.Item, error)
 	ListItems(context.Context) ([]*pb.Item, error)
+
+	AddCartElement(context.Context, int, int, float64) (error)
 }
 
 func NewShoppingCartServer() ShoppingCartService {
@@ -143,6 +145,19 @@ func (s shoppingCartService) ListItems(_ context.Context) ([]*pb.Item, error) {
 	}
 
 	return items, nil
+}
+
+func (s shoppingCartService) AddCartElement(_ context.Context, Cart_id int, Item_id int, Quantity float64) (error) {
+	db, err := connect()
+	if err != nil {
+		return err
+	}
+	defer db.Close()
+
+	sqlStatement := `INSERT INTO shopping_cart.CartElement (cart_id, item_id, quantity) VALUES(?,?,?);`
+	db.QueryRow(sqlStatement, Cart_id, Item_id, Quantity)
+	
+	return nil
 }
 
 func connect() (*sql.DB, error) {

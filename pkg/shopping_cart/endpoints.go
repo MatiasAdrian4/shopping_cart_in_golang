@@ -9,24 +9,28 @@ import (
 )
 
 type Endpoints struct {
-	AddCartEndpoint 	endpoint.Endpoint
-	GetCartEndpoint 	endpoint.Endpoint
-	ListCartsEndpoint	endpoint.Endpoint
+	AddCartEndpoint 		endpoint.Endpoint
+	GetCartEndpoint 		endpoint.Endpoint
+	ListCartsEndpoint		endpoint.Endpoint
 
-	AddItemEndpoint 	endpoint.Endpoint
-	GetItemEndpoint		endpoint.Endpoint
-	ListItemsEndpoint	endpoint.Endpoint
+	AddItemEndpoint 		endpoint.Endpoint
+	GetItemEndpoint			endpoint.Endpoint
+	ListItemsEndpoint		endpoint.Endpoint
+
+	AddCartElementEndpoint	endpoint.Endpoint
 }
 
 func MakeEndpoints(svc ShoppingCartService) Endpoints {
 	return Endpoints{
-		AddCartEndpoint: 	MakeAddCartEndpoint(svc),
-		GetCartEndpoint: 	MakeGetCartEndpoint(svc),
-		ListCartsEndpoint: 	MakeListCartsEndpoint(svc),
+		AddCartEndpoint: 		MakeAddCartEndpoint(svc),
+		GetCartEndpoint: 		MakeGetCartEndpoint(svc),
+		ListCartsEndpoint: 		MakeListCartsEndpoint(svc),
 
-		AddItemEndpoint: 	MakeAddItemEndpoint(svc),
-		GetItemEndpoint:	MakeGetItemEndpoint(svc),
-		ListItemsEndpoint:	MakeListItemsEndpoint(svc),
+		AddItemEndpoint: 		MakeAddItemEndpoint(svc),
+		GetItemEndpoint:		MakeGetItemEndpoint(svc),
+		ListItemsEndpoint:		MakeListItemsEndpoint(svc),
+
+		AddCartElementEndpoint: MakeAddCartElementEndpoint(svc),
 	}
 }
 
@@ -90,6 +94,16 @@ func (s Endpoints) ListItems(ctx context.Context) ([]*pb.Item, error) {
 	return response.Items, response.Err
 }
 
+func (s Endpoints) AddCartElement(ctx context.Context, Cart_id int, Item_id int, Quantity float64) (error) {
+	resp, err := s.AddCartElementEndpoint(ctx, AddCartElementRequest{Cart_id: Cart_id, Item_id: Item_id, Quantity: Quantity})
+	if err != nil {
+		return err
+	}
+	response := resp.(AddCartElementResponse)
+
+	return response.Err
+}
+
 func MakeAddCartEndpoint(svc ShoppingCartService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(AddCartRequest)
@@ -126,8 +140,8 @@ type GetCartRequest struct {
 }
 
 type GetCartResponse struct {
-	Cart	*pb.Cart   `json:"cart"`
-	Err		error `json:"err"`
+	Cart	*pb.Cart	`json:"cart"`
+	Err		error 		`json:"err"`
 }
 
 func MakeListCartsEndpoint(svc ShoppingCartService) endpoint.Endpoint {
@@ -144,8 +158,8 @@ type ListCartsRequest struct {
 }
 
 type ListCartsResponse struct {
-	Carts	[]*pb.Cart   `json:"carts"`
-	Err		error `json:"err"`
+	Carts	[]*pb.Cart	`json:"carts"`
+	Err		error 		`json:"err"`
 }
 
 func MakeAddItemEndpoint(svc ShoppingCartService) endpoint.Endpoint {
@@ -186,8 +200,8 @@ type GetItemRequest struct {
 }
 
 type GetItemResponse struct {
-	Item	*pb.Item   `json:"item"`
-	Err		error `json:"err"`
+	Item	*pb.Item	`json:"item"`
+	Err		error 		`json:"err"`
 }
 
 func MakeListItemsEndpoint(svc ShoppingCartService) endpoint.Endpoint {
@@ -204,6 +218,27 @@ type ListItemsRequest struct {
 }
 
 type ListItemsResponse struct {
-	Items	[]*pb.Item   `json:"items"`
-	Err		error `json:"err"`
+	Items	[]*pb.Item	`json:"items"`
+	Err		error 		`json:"err"`
+}
+
+func MakeAddCartElementEndpoint(svc ShoppingCartService) endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (interface{}, error) {
+		req := request.(AddCartElementRequest)
+		err := svc.AddCartElement(ctx, req.Cart_id, req.Item_id, req.Quantity)
+		if err != nil {
+			return AddCartElementResponse{err}, nil
+		}
+		return AddCartElementResponse{nil}, nil
+	}
+}
+
+type AddCartElementRequest struct {
+	Cart_id     int     `json:"cart_id"`
+	Item_id 	int  	`json:"item_id"`
+	Quantity  	float64 `json:"quantity"`
+}
+
+type AddCartElementResponse struct {
+	Err 	error `json:"err"`
 }

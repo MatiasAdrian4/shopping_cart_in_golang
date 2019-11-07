@@ -49,6 +49,11 @@ func NewHTTPHandler(endpoints Endpoints) http.Handler {
 		decodeHTTPListItemsRequest,
 		encodeHTTPGenericResponse,
 	))
+	m.Methods("POST").Path("/add_cart_element/").Handler(httptransport.NewServer(
+		endpoints.AddCartElementEndpoint,
+		decodeHTTPAddCartElementRequest,
+		encodeHTTPGenericResponse,
+	))
 
 	return m
 }
@@ -115,6 +120,12 @@ func decodeHTTPGetItemRequest(_ context.Context, r *http.Request) (interface{}, 
 
 func decodeHTTPListItemsRequest(_ context.Context, r *http.Request) (interface{}, error) {
 	return ListItemsRequest{}, nil
+}
+
+func decodeHTTPAddCartElementRequest(_ context.Context, r *http.Request) (interface{}, error) {
+	var req AddCartElementRequest
+	err := json.NewDecoder(r.Body).Decode(&req)
+	return req, err
 }
 
 func encodeHTTPGenericResponse(ctx context.Context, w http.ResponseWriter, response interface{}) error {

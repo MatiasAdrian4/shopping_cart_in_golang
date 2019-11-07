@@ -13,7 +13,7 @@ CREATE TABLE shopping_cart.Item (
 CREATE TABLE shopping_cart.CartElement (
 	cart_id INT,
 	item_id INT,
-	quantity INT,
+	quantity FLOAT,
 	FOREIGN KEY (cart_id) REFERENCES shopping_cart.Cart(id),
 	FOREIGN KEY (item_id) REFERENCES shopping_cart.Item(id)
 )
