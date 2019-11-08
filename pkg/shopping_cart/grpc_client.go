@@ -13,7 +13,7 @@ func NewGRPCClient(conn *grpc.ClientConn) ShoppingCartService {
 
 	addCartEndpoint := grpctransport.NewClient(
 		conn,
-		"pb.ShoppingCartService",
+		"pb.ShoppingCart",
 		"AddCart",
 		encodeGRPCAddCartRequest,
 		decodeGRPCAddCartResponse,
@@ -22,7 +22,7 @@ func NewGRPCClient(conn *grpc.ClientConn) ShoppingCartService {
 
 	addItemEndpoint := grpctransport.NewClient(
 		conn,
-		"pb.ShoppingCartService",
+		"pb.ShoppingCart",
 		"AddItem",
 		encodeGRPCAddItemRequest,
 		decodeGRPCAddItemResponse,
