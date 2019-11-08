@@ -17,6 +17,7 @@ type grpcServer struct {
 	getItem 		grpctransport.Handler
 	listItems 		grpctransport.Handler
 	addCartElement 	grpctransport.Handler
+	listItemsByCart	grpctransport.Handler
 }
 
 func NewGRPCServer(endpoints Endpoints) pb.ShoppingCartServer {
@@ -55,6 +56,11 @@ func NewGRPCServer(endpoints Endpoints) pb.ShoppingCartServer {
 			endpoints.AddCartElementEndpoint,
 			decodeGRPCAddCartElementRequest,
 			encodeGRPCAddCartElementResponse,
+		),
+		listItemsByCart: grpctransport.NewServer(
+			endpoints.ListItemsByCartEndpoint,
+			decodeGRPCListItemsByCartRequest,
+			encodeGRPCListItemsByCartResponse,
 		),
 	}
 }
@@ -213,6 +219,29 @@ func decodeGRPCAddCartElementRequest(_ context.Context, grpcReq interface{}) (in
 func encodeGRPCAddCartElementResponse(_ context.Context, response interface{}) (interface{}, error) {
 	resp := response.(AddCartElementResponse)
 	return &pb.AddCartElementResponse{
+		Err: err2str(resp.Err),
+	}, nil
+}
+
+func (s *grpcServer) ListItemsByCart(ctx context.Context, req *pb.ListItemsByCartRequest) (*pb.ListItemsByCartResponse, error) {
+	_, resp, err := s.listItemsByCart.ServeGRPC(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	return resp.(*pb.ListItemsByCartResponse), nil
+}
+
+func decodeGRPCListItemsByCartRequest(_ context.Context, grpcReq interface{}) (interface{}, error) {
+	req := grpcReq.(*pb.ListItemsByCartRequest)
+	return ListItemsByCartRequest{
+		Cart_id: int(req.CartId),
+	}, nil
+}
+
+func encodeGRPCListItemsByCartResponse(_ context.Context, response interface{}) (interface{}, error) {
+	resp := response.(ListItemsByCartResponse)
+	return &pb.ListItemsByCartResponse{
+		Items: resp.Items, 
 		Err: err2str(resp.Err),
 	}, nil
 }

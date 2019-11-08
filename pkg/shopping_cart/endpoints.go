@@ -18,19 +18,21 @@ type Endpoints struct {
 	ListItemsEndpoint		endpoint.Endpoint
 
 	AddCartElementEndpoint	endpoint.Endpoint
+	ListItemsByCartEndpoint	endpoint.Endpoint
 }
 
 func MakeEndpoints(svc ShoppingCartService) Endpoints {
 	return Endpoints{
-		AddCartEndpoint: 		MakeAddCartEndpoint(svc),
-		GetCartEndpoint: 		MakeGetCartEndpoint(svc),
-		ListCartsEndpoint: 		MakeListCartsEndpoint(svc),
+		AddCartEndpoint: 			MakeAddCartEndpoint(svc),
+		GetCartEndpoint: 			MakeGetCartEndpoint(svc),
+		ListCartsEndpoint: 			MakeListCartsEndpoint(svc),
 
-		AddItemEndpoint: 		MakeAddItemEndpoint(svc),
-		GetItemEndpoint:		MakeGetItemEndpoint(svc),
-		ListItemsEndpoint:		MakeListItemsEndpoint(svc),
+		AddItemEndpoint: 			MakeAddItemEndpoint(svc),
+		GetItemEndpoint:			MakeGetItemEndpoint(svc),
+		ListItemsEndpoint:			MakeListItemsEndpoint(svc),
 
-		AddCartElementEndpoint: MakeAddCartElementEndpoint(svc),
+		AddCartElementEndpoint: 	MakeAddCartElementEndpoint(svc),
+		ListItemsByCartEndpoint:	MakeListItemsByCartEndpoint(svc),
 	}
 }
 
@@ -102,6 +104,16 @@ func (s Endpoints) AddCartElement(ctx context.Context, Cart_id int, Item_id int,
 	response := resp.(AddCartElementResponse)
 
 	return response.Err
+}
+
+func (s Endpoints) ListItemsByCart(ctx context.Context, Cart_id int) ([]*pb.Item, error) {
+	resp, err := s.ListItemsByCartEndpoint(ctx, ListItemsByCartRequest{Cart_id: Cart_id})
+	if err != nil {
+		return nil, err
+	}
+	response := resp.(ListItemsByCartResponse)
+
+	return response.Items, response.Err
 }
 
 func MakeAddCartEndpoint(svc ShoppingCartService) endpoint.Endpoint {
@@ -241,4 +253,24 @@ type AddCartElementRequest struct {
 
 type AddCartElementResponse struct {
 	Err 	error `json:"err"`
+}
+
+func MakeListItemsByCartEndpoint(svc ShoppingCartService) endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (interface{}, error) {
+		req := request.(ListItemsByCartRequest)
+		v, err := svc.ListItemsByCart(ctx, req.Cart_id)
+		if err != nil {
+			return ListItemsByCartResponse{v, err}, nil
+		}
+		return ListItemsByCartResponse{v, nil}, nil
+	}
+}
+
+type ListItemsByCartRequest struct {
+	Cart_id	int	`json:"cart_id"`
+}
+
+type ListItemsByCartResponse struct {
+	Items	[]*pb.Item	`json:"items"`
+	Err		error 		`json:"err"`
 }

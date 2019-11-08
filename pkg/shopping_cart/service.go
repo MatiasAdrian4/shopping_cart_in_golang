@@ -21,6 +21,7 @@ type ShoppingCartService interface {
 	ListItems(context.Context) ([]*pb.Item, error)
 
 	AddCartElement(context.Context, int, int, float64) (error)
+	ListItemsByCart(context.Context, int) ([]*pb.Item, error)
 }
 
 func NewShoppingCartServer() ShoppingCartService {
@@ -158,6 +159,40 @@ func (s shoppingCartService) AddCartElement(_ context.Context, Cart_id int, Item
 	db.QueryRow(sqlStatement, Cart_id, Item_id, Quantity)
 	
 	return nil
+}
+
+func (s shoppingCartService) ListItemsByCart(_ context.Context, cart_id int) ([]*pb.Item, error) {
+	db, err := connect()
+	if err != nil {
+		panic(err)
+	}
+	defer db.Close()
+
+	sqlStatement := `SELECT item_id FROM shopping_cart.CartElement WHERE cart_id=?`
+	all_items, err := db.Query(sqlStatement, cart_id)
+	if err != nil {
+		return nil, err
+	}
+
+	var items []*pb.Item
+	sqlStatement = `SELECT id, detail, price FROM shopping_cart.Item WHERE id=?;`
+	
+	for all_items.Next() {
+		var item_id int
+		all_items.Scan(&item_id)
+		row := db.QueryRow(sqlStatement, item_id)
+		var id int
+		var detail string
+		var price float64
+		row.Scan(&id, &detail, &price)
+		items = append(items, &pb.Item{
+			Id: int64(id),
+			Detail: detail,
+			Price: price,
+		})
+	}
+
+	return items, nil
 }
 
 func connect() (*sql.DB, error) {

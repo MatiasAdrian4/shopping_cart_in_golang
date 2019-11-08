@@ -54,6 +54,11 @@ func NewHTTPHandler(endpoints Endpoints) http.Handler {
 		decodeHTTPAddCartElementRequest,
 		encodeHTTPGenericResponse,
 	))
+	m.Methods("GET").Path("/list_items_by_cart/{cart_id}").Handler(httptransport.NewServer(
+		endpoints.ListItemsByCartEndpoint,
+		decodeHTTPListItemsByCartRequest,
+		encodeHTTPGenericResponse,
+	))
 
 	return m
 }
@@ -126,6 +131,16 @@ func decodeHTTPAddCartElementRequest(_ context.Context, r *http.Request) (interf
 	var req AddCartElementRequest
 	err := json.NewDecoder(r.Body).Decode(&req)
 	return req, err
+}
+
+func decodeHTTPListItemsByCartRequest(_ context.Context, r *http.Request) (interface{}, error) {
+	var req ListItemsByCartRequest
+	cart_id, err := strconv.Atoi(mux.Vars(r)["cart_id"])
+	if err != nil {
+		return nil, err
+	}
+	req.Cart_id = cart_id
+	return req, nil
 }
 
 func encodeHTTPGenericResponse(ctx context.Context, w http.ResponseWriter, response interface{}) error {

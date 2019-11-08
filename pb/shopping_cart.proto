@@ -12,6 +12,7 @@ service ShoppingCart {
     rpc ListItems (ListItemsRequest) returns (ListItemsResponse) {}
 
     rpc AddCartElement (AddCartElementRequest) returns (AddCartElementResponse) {}
+    rpc ListItemsByCart (ListItemsByCartRequest) returns (ListItemsByCartResponse) {}
 }
 
 message Cart {
@@ -92,4 +93,13 @@ message AddCartElementRequest {
 
 message AddCartElementResponse {
     string err = 1;
+}
+
+message ListItemsByCartRequest {
+    int64 cart_id = 1;
+}
+
+message ListItemsByCartResponse {
+    repeated Item items = 1;
+    string err = 2;
 }
