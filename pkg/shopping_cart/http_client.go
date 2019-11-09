@@ -1,6 +1,7 @@
 package shopping_cart
 
 import (
+	"fmt"
 	"bytes"
 	"context"
 	"encoding/json"
@@ -21,17 +22,16 @@ func NewHTTPClient(instance string) (ShoppingCartService, error) {
 	if err != nil {
 		return nil, err
 	}
-
 	addCartEndpoint := httptransport.NewClient(
 		"POST",
-		copyURL(u, "/add_cart"),
+		copyURL(u, "/add_cart/"),
 		encodeHTTPGenericRequest,
 		decodeHTTPAddCartResponse,
 	).Endpoint()
 
 	addItemEndpoint := httptransport.NewClient(
 		"POST",
-		copyURL(u, "/add_cart"),
+		copyURL(u, "/add_item/"),
 		encodeHTTPGenericRequest,
 		decodeHTTPAddItemResponse,
 	).Endpoint()
@@ -40,6 +40,16 @@ func NewHTTPClient(instance string) (ShoppingCartService, error) {
 		AddCartEndpoint: addCartEndpoint,
 		AddItemEndpoint: addItemEndpoint,
 	}, nil
+}
+
+func encodeHTTPGenericRequest(_ context.Context, r *http.Request, request interface{}) error {
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(request); err != nil {
+		return err
+	}
+	r.Body = ioutil.NopCloser(&buf)
+	fmt.Println(r.Body)
+	return nil
 }
 
 func decodeHTTPAddCartResponse(_ context.Context, r *http.Response) (interface{}, error) {
@@ -58,13 +68,4 @@ func decodeHTTPAddItemResponse(_ context.Context, r *http.Response) (interface{}
 	var resp AddItemResponse
 	err := json.NewDecoder(r.Body).Decode(&resp)
 	return resp, err
-}
-
-func encodeHTTPGenericRequest(_ context.Context, r *http.Request, request interface{}) error {
-	var buf bytes.Buffer
-	if err := json.NewEncoder(&buf).Encode(request); err != nil {
-		return err
-	}
-	r.Body = ioutil.NopCloser(&buf)
-	return nil
 }
