@@ -1,14 +1,12 @@
 package main
 
 import (
-	"flag"
 	"fmt"
 	"net"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
-	"text/tabwriter"
 
 	kitgrpc "github.com/go-kit/kit/transport/grpc"
 
@@ -21,13 +19,8 @@ import (
 
 func main() {
 
-	fs := flag.NewFlagSet("addsvc", flag.ExitOnError)
-	var (
-		httpAddr = fs.String("http-addr", ":8081", "HTTP listen address")
-		grpcAddr = fs.String("grpc-addr", ":8082", "gRPC listen address")
-	)
-	fs.Usage = usageFor(fs, os.Args[0]+" [flags]")
-	fs.Parse(os.Args[1:])
+	httpAddr := ":8081"
+	grpcAddr := ":8082"
 
 	var (
 		service     = sc.NewShoppingCartServer()
@@ -38,7 +31,7 @@ func main() {
 
 	var g group.Group
 
-	httpListener, err := net.Listen("tcp", *httpAddr)
+	httpListener, err := net.Listen("tcp", httpAddr)
 	if err != nil {
 		os.Exit(1)
 	}
@@ -48,7 +41,7 @@ func main() {
 		httpListener.Close()
 	})
 
-	grpcListener, err := net.Listen("tcp", *grpcAddr)
+	grpcListener, err := net.Listen("tcp", grpcAddr)
 	if err != nil {
 		os.Exit(1)
 	}
@@ -76,19 +69,4 @@ func main() {
 
 	g.Run()
 
-}
-
-func usageFor(fs *flag.FlagSet, short string) func() {
-	return func() {
-		fmt.Fprintf(os.Stderr, "USAGE\n")
-		fmt.Fprintf(os.Stderr, "  %s\n", short)
-		fmt.Fprintf(os.Stderr, "\n")
-		fmt.Fprintf(os.Stderr, "FLAGS\n")
-		w := tabwriter.NewWriter(os.Stderr, 0, 2, 2, ' ', 0)
-		fs.VisitAll(func(f *flag.Flag) {
-			fmt.Fprintf(w, "\t-%s %s\t%s\n", f.Name, f.DefValue, f.Usage)
-		})
-		w.Flush()
-		fmt.Fprintf(os.Stderr, "\n")
-	}
 }
