@@ -2,7 +2,7 @@
 
 ## Introduction
 
-A simple shopping cart developed in Golang, based on "addsvc" example `https://github.com/go-kit/kit/tree/master/examples/addsvc`
+A simple shopping cart developed in Golang, based on [addsvc](https://github.com/go-kit/kit/tree/master/examples/addsvc) example.
 
 ## Installation
 
