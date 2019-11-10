@@ -2,7 +2,7 @@
 
 ## Introduction
 
-A simple shopping cart developed in Golang, based on [addsvc](https://github.com/go-kit/kit/tree/master/examples/addsvc) example.
+A simple shopping cart developed in Golang, based on [addsvc](https://github.com/go-kit/kit/tree/master/examples/addsvc).
 
 ## Installation
 
@@ -38,4 +38,11 @@ go run cmd/client/main.go http add_cart 5
 ```bash
 go run cmd/client/main.go grpc add_item 2 ball 750
 ```
+
+#### Recommended tools to consume the services
+
+- [Postman](https://www.getpostman.com/) for HTTP Calls.
+- [BloomRPC](https://github.com/uw-labs/bloomrpc) for GRPC Calls.
+
+
 
