@@ -15,8 +15,8 @@ import (
 	"github.com/oklog/oklog/pkg/group"
 	"google.golang.org/grpc"
 
-	sc "shopping_cart/pkg/shopping_cart"
-	"shopping_cart/pb"
+	sc "shopping_cart_in_golang_with_go_kit/pkg/shopping_cart"
+	"shopping_cart_in_golang_with_go_kit/pb"
 )
 
 func main() {

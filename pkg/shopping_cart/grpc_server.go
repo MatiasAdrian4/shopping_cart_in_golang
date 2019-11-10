@@ -6,7 +6,7 @@ import (
 
 	grpctransport "github.com/go-kit/kit/transport/grpc"
 
-	"shopping_cart/pb"
+	"shopping_cart_in_golang_with_go_kit/pb"
 )
 
 type grpcServer struct {

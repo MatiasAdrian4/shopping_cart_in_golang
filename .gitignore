@@ -1,6 +1,1 @@
-go.mod
-go.sum
-main_client
-main_server
-notes
-pb/shopping_cart.pb.go
+main.exe

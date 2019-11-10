@@ -8,7 +8,7 @@ import (
 
 	_ "github.com/go-sql-driver/mysql"
 
-	"shopping_cart/pb"
+	"shopping_cart_in_golang_with_go_kit/pb"
 )
 
 type ShoppingCartService interface {

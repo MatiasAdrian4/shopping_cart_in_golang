@@ -10,7 +10,7 @@ import (
 
 	"google.golang.org/grpc"
 	
-	sc "shopping_cart/pkg/shopping_cart"
+	sc "shopping_cart_in_golang_with_go_kit/pkg/shopping_cart"
 )
 
 func main() {

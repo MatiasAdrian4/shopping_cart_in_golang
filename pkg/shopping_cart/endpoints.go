@@ -5,7 +5,7 @@ import (
 
 	"github.com/go-kit/kit/endpoint"
 
-	"shopping_cart/pb"
+	"shopping_cart_in_golang_with_go_kit/pb"
 )
 
 type Endpoints struct {
