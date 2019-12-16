@@ -16,6 +16,11 @@ git clone https://github.com/MatiasAdrian4/shopping_cart_in_golang_with_go_kit.g
 protoc pb/shopping_cart.proto --go_out=plugins=grpc:.
 ```
 
+#### Create Go Module
+```bash
+go mod init shopping_cart_in_golang_with_go_kit
+```
+
 #### Build
 ```bash
 go build cmd/server/main.go
