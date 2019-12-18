@@ -15,6 +15,8 @@ import (
 
 	sc "shopping_cart_in_golang_with_go_kit/pkg/shopping_cart"
 	"shopping_cart_in_golang_with_go_kit/pb"
+
+	"github.com/gorilla/handlers"
 )
 
 func main() {
@@ -31,14 +33,9 @@ func main() {
 
 	var g group.Group
 
-	httpListener, err := net.Listen("tcp", httpAddr)
-	if err != nil {
-		os.Exit(1)
-	}
 	g.Add(func() error {
-		return http.Serve(httpListener, httpHandler)
+		return (http.ListenAndServe(httpAddr, handlers.CORS(handlers.AllowedHeaders([]string{"X-Requested-With", "Content-Type", "Authorization"}), handlers.AllowedMethods([]string{"GET", "POST", "PUT", "HEAD", "OPTIONS"}), handlers.AllowedOrigins([]string{"*"}))(httpHandler)))
 	}, func(error) {
-		httpListener.Close()
 	})
 
 	grpcListener, err := net.Listen("tcp", grpcAddr)
