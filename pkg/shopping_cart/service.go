@@ -41,7 +41,7 @@ func (s shoppingCartService) AddCart(_ context.Context, Id int) (int, error) {
 
 	err = db.QueryRow("INSERT INTO shopping_cart.Cart (id) VALUES(" + strconv.Itoa(Id) + ")").Scan()
 	if strings.Split(err.Error(), ":")[0] == "Error 1062" {
-		return 0, errs.NewDuplicityCartError(err)
+		return 0, errs.DuplicityCartError(err)
 	} else {
 		return Id, nil
 	}
@@ -59,7 +59,7 @@ func (s shoppingCartService) GetCart(_ context.Context, Id int) (*pb.Cart, error
 	var id int
 	err = row.Scan(&id)
 	if err != nil {
-		return nil, err
+		return nil, errs.CartDoesNotExist(err)
 	}
 	return &pb.Cart{
 		Id: int64(id),
@@ -97,9 +97,12 @@ func (s shoppingCartService) AddItem(_ context.Context, Id int, Detail string, P
 	}
 	defer db.Close()
 
-	db.QueryRow("INSERT INTO shopping_cart.Item (id,detail,price) VALUES(" + strconv.Itoa(Id) + ",'" + Detail + "'," + fmt.Sprintf("%f", Price) + ")")
-
-	return Id, nil
+	err = db.QueryRow("INSERT INTO shopping_cart.Item (id,detail,price) VALUES(" + strconv.Itoa(Id) + ",'" + Detail + "'," + fmt.Sprintf("%f", Price) + ")").Scan()
+	if strings.Split(err.Error(), ":")[0] == "Error 1062" {
+		return 0, errs.DuplicityItemError(err)
+	} else {
+		return Id, nil
+	}
 }
 
 func (s shoppingCartService) GetItem(_ context.Context, Id int) (*pb.Item, error) {
@@ -116,7 +119,7 @@ func (s shoppingCartService) GetItem(_ context.Context, Id int) (*pb.Item, error
 	var price float64
 	err = row.Scan(&id, &detail, &price)
 	if err != nil {
-		return nil, err
+		return nil, errs.ItemDoesNotExist(err)
 	}
 	return &pb.Item{
 		Id: int64(id),
@@ -161,9 +164,12 @@ func (s shoppingCartService) AddCartElement(_ context.Context, Cart_id int, Item
 	defer db.Close()
 
 	sqlStatement := `INSERT INTO shopping_cart.CartElement (cart_id, item_id, quantity) VALUES(?,?,?);`
-	db.QueryRow(sqlStatement, Cart_id, Item_id, Quantity)
-	
-	return nil
+	err = db.QueryRow(sqlStatement, Cart_id, Item_id, Quantity).Scan()
+	if strings.Split(err.Error(), ":")[0] == "Error 1452" {
+		return errs.CartOrItemDoesNotExist(err)
+	} else {
+		return nil
+	}
 }
 
 func (s shoppingCartService) ListItemsByCart(_ context.Context, cart_id int) ([]*pb.Item, error) {

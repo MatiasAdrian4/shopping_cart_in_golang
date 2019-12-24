@@ -137,10 +137,7 @@ func MakeGetCartEndpoint(svc ShoppingCartService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(GetCartRequest)
 		v, err := svc.GetCart(ctx, req.Id)
-		if err != nil {
-			return GetCartResponse{v, err}, nil
-		}
-		return GetCartResponse{v, nil}, nil
+		return GetCartResponse{v, err}, err
 	}
 }
 
@@ -156,10 +153,7 @@ type GetCartResponse struct {
 func MakeListCartsEndpoint(svc ShoppingCartService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		v, err := svc.ListCarts(ctx)
-		if err != nil {
-			return ListCartsResponse{v, err}, nil
-		}
-		return ListCartsResponse{v, nil}, nil
+		return ListCartsResponse{v, err}, err
 	}
 }
 
@@ -175,10 +169,7 @@ func MakeAddItemEndpoint(svc ShoppingCartService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(AddItemRequest)
 		v, err := svc.AddItem(ctx, req.Id, req.Detail, req.Price)
-		if err != nil {
-			return AddItemResponse{v, err}, nil
-		}
-		return AddItemResponse{v, nil}, nil
+		return AddItemResponse{v, err}, err
 	}
 }
 
@@ -197,10 +188,7 @@ func MakeGetItemEndpoint(svc ShoppingCartService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(GetItemRequest)
 		v, err := svc.GetItem(ctx, req.Id)
-		if err != nil {
-			return GetItemResponse{v, err}, nil
-		}
-		return GetItemResponse{v, nil}, nil
+		return GetItemResponse{v, err}, err
 	}
 }
 
@@ -216,10 +204,7 @@ type GetItemResponse struct {
 func MakeListItemsEndpoint(svc ShoppingCartService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		v, err := svc.ListItems(ctx)
-		if err != nil {
-			return ListItemsResponse{v, err}, nil
-		}
-		return ListItemsResponse{v, nil}, nil
+		return ListItemsResponse{v, err}, err
 	}
 }
 
@@ -235,10 +220,7 @@ func MakeAddCartElementEndpoint(svc ShoppingCartService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(AddCartElementRequest)
 		err := svc.AddCartElement(ctx, req.Cart_id, req.Item_id, req.Quantity)
-		if err != nil {
-			return AddCartElementResponse{err}, nil
-		}
-		return AddCartElementResponse{nil}, nil
+		return AddCartElementResponse{err}, err
 	}
 }
 
