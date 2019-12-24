@@ -5,10 +5,12 @@ import (
 	"context"
 	"database/sql"
 	"strconv"
+	"strings"
 
 	_ "github.com/go-sql-driver/mysql"
 
 	"shopping_cart_in_golang_with_go_kit/pb"
+	"shopping_cart_in_golang_with_go_kit/errs"
 )
 
 type ShoppingCartService interface {
@@ -37,9 +39,12 @@ func (s shoppingCartService) AddCart(_ context.Context, Id int) (int, error) {
 	}
 	defer db.Close()
 
-	db.QueryRow("INSERT INTO shopping_cart.Cart (id) VALUES(" + strconv.Itoa(Id) + ")")
-
-	return Id, nil
+	err = db.QueryRow("INSERT INTO shopping_cart.Cart (id) VALUES(" + strconv.Itoa(Id) + ")").Scan()
+	if strings.Split(err.Error(), ":")[0] == "Error 1062" {
+		return 0, errs.NewDuplicityCartError(err)
+	} else {
+		return Id, nil
+	}
 }
 
 func (s shoppingCartService) GetCart(_ context.Context, Id int) (*pb.Cart, error) {

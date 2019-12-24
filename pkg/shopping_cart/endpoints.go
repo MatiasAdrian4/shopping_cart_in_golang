@@ -120,10 +120,7 @@ func MakeAddCartEndpoint(svc ShoppingCartService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(AddCartRequest)
 		v, err := svc.AddCart(ctx, req.Id)
-		if err != nil {
-			return AddCartResponse{v, err}, nil
-		}
-		return AddCartResponse{v, nil}, nil
+		return AddCartResponse{v, err}, err
 	}
 }
 

@@ -7,6 +7,7 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"strings"
 
 	kitgrpc "github.com/go-kit/kit/transport/grpc"
 
@@ -34,14 +35,18 @@ func main() {
 	var g group.Group
 
 	g.Add(func() error {
+		fmt.Println("Running server on", strings.Split(httpAddr, ":")[1])
 		return (http.ListenAndServe(httpAddr, handlers.CORS(handlers.AllowedHeaders([]string{"X-Requested-With", "Content-Type", "Authorization"}), handlers.AllowedMethods([]string{"GET", "POST", "PUT", "HEAD", "OPTIONS"}), handlers.AllowedOrigins([]string{"*"}))(httpHandler)))
 	}, func(error) {
+		fmt.Println("Closing server on", strings.Split(httpAddr, ":")[1])
+		os.Exit(1)
 	})
 
 	grpcListener, err := net.Listen("tcp", grpcAddr)
 	if err != nil {
 		os.Exit(1)
 	}
+
 	g.Add(func() error {
 		baseServer := grpc.NewServer(grpc.UnaryInterceptor(kitgrpc.Interceptor))
 		pb.RegisterShoppingCartServer(baseServer, grpcServer)
